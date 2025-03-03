@@ -1,16 +1,27 @@
 using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Transform player;
+    public float speed = 3f;
+    private Rigidbody2D rb;
+    private Vector2 movement;
+
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        Vector3 direction = (player.position - transform.position).normalized;
+        movement = new Vector2(direction.x, direction.y);
+    }
+
+    void FixedUpdate()
+    {
+        rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
     }
 }
