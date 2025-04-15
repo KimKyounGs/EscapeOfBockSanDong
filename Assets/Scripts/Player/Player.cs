@@ -3,9 +3,18 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("이동 설정")]
-    public float moveSpeed = 5f; // 이동 속도
+    [SerializeField] float moveSpeed = 5f; // 이동 속도
+    [SerializeField] private Vector2 movement;
+
+
+    [Header("시민")]
+    [SerializeField] private float holdTime = 0f;
+    [SerializeField] private float requirHoldTime = 3f;
+    [SerializeField] private Citizen targetCitizen;
+    [SerializeField] private Citizen[] citizens;
+    
     private Rigidbody2D rb;
-    private Vector2 movement;
+
 
     void Start()
     {
@@ -14,9 +23,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // WASD 입력 감지
-        movement.x = Input.GetAxisRaw("Horizontal"); // A, D 또는 ←, →
-        movement.y = Input.GetAxisRaw("Vertical");   // W, S 또는 ↑, ↓
+        KeyInput();
 
         // 플레이어 회전 (마우스 방향)
         RotateTowardsMouse();
@@ -26,6 +33,47 @@ public class PlayerMovement : MonoBehaviour
     {
         // Rigidbody2D를 이용해 부드럽게 이동
         rb.linearVelocity = movement.normalized * moveSpeed;
+    }
+
+    void KeyInput()
+    {
+        Move();
+        Rescuing();
+    }
+
+    void Move()
+    {
+        // WASD 입력 감지
+        movement.x = Input.GetAxisRaw("Horizontal"); // A, D 또는 ←, →
+        movement.y = Input.GetAxisRaw("Vertical");   // W, S 또는 ↑, ↓
+    }
+
+    void Rescuing()
+    {
+        if (Input.GetKey(KeyCode.E))
+        {
+            holdTime += Time.deltaTime;
+
+            if (targetCitizen != null)
+            {
+                targetCitizen.SetRescueProgress(holdTime / requirHoldTime);
+            }
+
+            if (holdTime >= requirHoldTime)
+            {
+                targetCitizen.Rescue();
+                targetCitizen = null;
+                holdTime = 0f;
+            }
+        }
+        else
+        {
+            holdTime = 0f;
+            if (targetCitizen != null)
+            {
+                targetCitizen.SetRescueProgress(0f);
+            }
+        }
     }
 
     void RotateTowardsMouse()
@@ -47,6 +95,22 @@ public class PlayerMovement : MonoBehaviour
         x축을 기준으로 몇 도 차이가 나는지 반환하기 때문에 마우스를 완전히 화살표의 오른쪽에 놓는다면, angle은 0을 가르킨다.
         하지만 우리 인간의 기준으로는 마우스가 화살표의 오른쪽에 있다면 화살표가 오른쪽으로 90도 회전해야 맞다.
         */
+    }
 
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Citizen"))
+        {
+            targetCitizen = collision.GetComponent<Citizen>();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Citizen") && targetCitizen != null && targetCitizen.gameObject == collision.gameObject)
+        {
+            targetCitizen = null;
+            holdTime = 0f;
+        }
     }
 }

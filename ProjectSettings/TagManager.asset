@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Light
+  - Citizen
   layers:
   - Default
   - TransparentFX
@@ -13,10 +14,10 @@ TagManager:
   - Water
   - UI
   - Obstacle
+  - Player
+  - Citizen
   - Wall
   - Enemy
-  - 
-  - 
   - 
   - 
   - 
@@ -57,8 +58,14 @@ TagManager:
   - name: Enemy
     uniqueID: 1048624667
     locked: 0
+  - name: Citizen
+    uniqueID: 2089402277
+    locked: 0
   - name: Player
     uniqueID: 2268996033
+    locked: 0
+  - name: WorldUI
+    uniqueID: 1721604533
     locked: 0
   m_RenderingLayers:
   - Default
